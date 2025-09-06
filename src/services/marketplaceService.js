@@ -128,6 +128,67 @@ export const marketplaceService = {
     }
   },
 
+  async addProduct(productData) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return { data: null, error: 'You must be logged in to create a product.' };
+      }
+
+      // 1. Insert the product
+      const { data: newProduct, error: productError } = await supabase
+        .from('products')
+        .insert([
+          {
+            seller_id: user.id,
+            category_id: productData.category_id,
+            title: productData.title,
+            description: productData.description,
+            price_inr: productData.price,
+            original_price_inr: productData.originalPrice,
+            condition: productData.condition,
+            brand: productData.brand,
+            story_snippet: productData.story_snippet,
+            tags: productData.tags,
+            stock_quantity: productData.stock_quantity,
+          },
+        ])
+        .select()
+        .single();
+
+      if (productError) {
+        console.error('Error creating product:', productError);
+        return { data: null, error: 'Failed to create product' };
+      }
+
+      // 2. Insert product images
+      if (productData.images && productData.images.length > 0) {
+        const imageInserts = productData.images.map((image, index) => ({
+          product_id: newProduct.id,
+          image_url: image.url,
+          alt_text: image.alt || productData.title,
+          is_primary: index === 0, // First image is primary
+        }));
+
+        const { error: imageError } = await supabase
+          .from('product_images')
+          .insert(imageInserts);
+
+        if (imageError) {
+          console.error('Error adding product images:', imageError);
+          // Optionally, delete the product if images fail to upload
+          await supabase.from('products').delete().eq('id', newProduct.id);
+          return { data: null, error: 'Failed to add product images.' };
+        }
+      }
+
+      return { data: newProduct, error: null };
+    } catch (error) {
+      console.error('Service error creating product:', error);
+      return { data: null, error: 'An unexpected error occurred while creating the product.' };
+    }
+  },
+
   async getCategories() {
     try {
       const { data, error } = await supabase?.from('categories')?.select('*')?.eq('is_active', true)?.order('name');

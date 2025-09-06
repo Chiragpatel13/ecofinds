@@ -5,8 +5,7 @@ import Button from '../../components/ui/Button';
 import MetricsCard from './components/MetricsCard';
 import ListingCard from './components/ListingCard';
 import AnalyticsChart from './components/AnalyticsChart';
-import PhotoUploadZone from './components/PhotoUploadZone';
-import PricingGuidance from './components/PricingGuidance';
+import CreateListingForm from './components/CreateListingForm';
 import MessageCenter from './components/MessageCenter';
 import PayoutSection from './components/PayoutSection';
 import AchievementBadges from './components/AchievementBadges';
@@ -14,6 +13,7 @@ import AchievementBadges from './components/AchievementBadges';
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedListingFilter, setSelectedListingFilter] = useState('all');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Mock data for metrics
   const metricsData = [
@@ -177,12 +177,12 @@ const SellerDashboard = () => {
     console.log('Promote listing:', listingId);
   };
 
-  const handlePhotosUploaded = (photos) => {
-    console.log('Photos uploaded:', photos);
-  };
-
-  const handlePriceSet = (price) => {
-    console.log('Price set:', price);
+  const handleListingCreated = (newListing) => {
+    console.log('New listing created:', newListing);
+    setShowSuccessMessage(true);
+    setActiveTab('listings');
+    // Optionally, refetch listings or add the new listing to the state
+    setTimeout(() => setShowSuccessMessage(false), 4000); // Hide after 4 seconds
   };
 
   const renderTabContent = () => {
@@ -279,6 +279,13 @@ const SellerDashboard = () => {
       case 'listings':
         return (
           <div className="space-y-6">
+            {showSuccessMessage && (
+              <div className="bg-success-subtle text-success-foreground p-4 rounded-lg flex items-center space-x-3">
+                <Icon name="CheckCircle" size={20} />
+                <p className="font-medium">Listing created successfully!</p>
+              </div>
+            )}
+
             {/* Filters */}
             <div className="bg-card rounded-lg p-6 shadow-organic border border-border">
               <div className="flex items-center justify-between mb-4">
@@ -352,84 +359,7 @@ const SellerDashboard = () => {
               <p className="text-muted-foreground mb-6">
                 Add photos and details to create your listing. Our AI will help optimize your pricing and visibility.
               </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <PhotoUploadZone onPhotosUploaded={handlePhotosUploaded} />
-              <PricingGuidance onPriceSet={handlePriceSet} />
-            </div>
-
-            <div className="bg-card rounded-lg p-6 shadow-organic border border-border">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Listing Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Title *
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Vintage Leather Jacket - Brown, Size M"
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Category *
-                  </label>
-                  <select className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent">
-                    <option value="">Select category</option>
-                    <option value="fashion">Fashion</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="home">Home & Garden</option>
-                    <option value="books">Books</option>
-                    <option value="sports">Sports</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Description *
-                  </label>
-                  <textarea
-                    rows={4}
-                    placeholder="Describe the item's condition, history, and any unique features..."
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                  ></textarea>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Condition *
-                  </label>
-                  <select className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent">
-                    <option value="">Select condition</option>
-                    <option value="new">Like New</option>
-                    <option value="excellent">Excellent</option>
-                    <option value="good">Good</option>
-                    <option value="fair">Fair</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Price *
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2 text-muted-foreground">$</span>
-                    <input
-                      type="number"
-                      placeholder="0.00"
-                      className="w-full pl-8 pr-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-4 mt-6">
-                <Button variant="outline">
-                  Save as Draft
-                </Button>
-                <Button variant="default" iconName="Upload" iconPosition="left">
-                  Publish Listing
-                </Button>
-              </div>
+              <CreateListingForm onListingCreated={handleListingCreated} />
             </div>
           </div>
         );
