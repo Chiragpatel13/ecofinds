@@ -9,6 +9,9 @@ import Marketplace from './pages/marketplace';
 import ImpactTracker from './pages/impact-tracker';
 import Homepage from './pages/homepage';
 import CommunityHub from './pages/community-hub';
+import PaymentPage from "./pages/payment";
+import AboutPage from "./pages/about";
+import AuthPage from "./pages/auth";
 
 const Routes = () => {
   return (
@@ -24,6 +27,9 @@ const Routes = () => {
         <Route path="/impact-tracker" element={<ImpactTracker />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/community-hub" element={<CommunityHub />} />
+        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
       </ErrorBoundary>

@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
-const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
+const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer, isAddingToCart }) => {
   const [offerAmount, setOfferAmount] = useState('');
   const [showOfferInput, setShowOfferInput] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState('standard');
@@ -40,7 +40,6 @@ const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
     }
   };
 
-  // Format price in INR
   const formatPrice = (price) => {
     if (!price) return '₹0';
     return `₹${parseFloat(price)?.toLocaleString('en-IN')}`;
@@ -48,8 +47,8 @@ const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
 
   const selectedShippingOption = shippingOptions?.find(option => option?.id === selectedShipping);
   const totalPrice = (product?.price || 0) + (selectedShippingOption?.price || 0);
-  const minOffer = product?.price ? product?.price * 0.7 : 0;
-  const maxOffer = product?.price ? product?.price * 0.95 : 0;
+  const minOffer = product?.price ? product.price * 0.7 : 0;
+  const maxOffer = product?.price ? product.price * 0.95 : 0;
 
   return (
     <div className="bg-card border border-border rounded-xl p-6 space-y-6 sticky top-24">
@@ -79,7 +78,8 @@ const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
               key={option?.id}
               className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                 selectedShipping === option?.id
-                  ? 'border-primary bg-primary/5' :'border-border hover:bg-surface'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:bg-surface'
               }`}
             >
               <input
@@ -87,7 +87,7 @@ const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
                 name="shipping"
                 value={option?.id}
                 checked={selectedShipping === option?.id}
-                onChange={(e) => setSelectedShipping(e?.target?.value)}
+                onChange={(e) => setSelectedShipping(e.target.value)}
                 className="sr-only"
               />
               <Icon name={option?.icon} size={20} className="text-muted-foreground" />
@@ -118,11 +118,12 @@ const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
           variant="outline"
           fullWidth
           size="lg"
-          iconName="Plus"
+          iconName={isAddingToCart ? 'Loader' : 'Plus'}
           iconPosition="left"
           onClick={onAddToCart}
+          disabled={isAddingToCart}
         >
-          Add to Cart
+          {isAddingToCart ? 'Adding...' : 'Add to Cart'}
         </Button>
 
         {/* Make Offer Section */}
@@ -142,7 +143,7 @@ const PurchaseSection = ({ product, onAddToCart, onBuyNow, onMakeOffer }) => {
               type="number"
               placeholder={`Enter offer (min ${formatPrice(minOffer)})`}
               value={offerAmount}
-              onChange={(e) => setOfferAmount(e?.target?.value)}
+              onChange={(e) => setOfferAmount(e.target.value)}
               min={minOffer}
               max={maxOffer}
             />
